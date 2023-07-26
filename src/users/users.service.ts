@@ -1,26 +1,92 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { User } from './entities/user.entity';
+import { isString, isUUID } from 'class-validator';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UsersService {
+  private users: User[] = [];
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const { login, password } = createUserDto;
+
+    if (!login || !password) {
+      throw new BadRequestException('Login and password are required fields');
+    }
+
+    const newUser: User = {
+      id: uuidv4(),
+      login: login,
+      password: password,
+      version: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    this.users.push(newUser);
+    return newUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  findAll(): User[] {
+    return this.users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string): User {
+    if (!id || !isUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const currentUser = this.users.find((user) => user.id === id);
+
+    if (currentUser) {
+      return currentUser;
+    } else {
+      throw new NotFoundException('User not found');
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updatePasswordDto: UpdatePasswordDto): User {
+    const { newPassword, oldPassword } = updatePasswordDto;
+
+    if (!id || !isUUID(id) || !isString(newPassword)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const user = this.users.find((user) => user.id === id);
+
+    if (user) {
+      const old = user.password;
+      if (old !== oldPassword) {
+        throw new ForbiddenException('Old password is wrong');
+      }
+
+      user.password = newPassword;
+      user.version += 1;
+      user.updatedAt = Date.now();
+
+      return user;
+    } else {
+      throw new NotFoundException('User not found');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    if (!id || !isUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const user = this.users.find((user) => user.id === id);
+    if (user) {
+      this.users = this.users.filter((user) => user.id !== id);
+    } else {
+      throw new NotFoundException('User not found');
+    }
   }
 }
