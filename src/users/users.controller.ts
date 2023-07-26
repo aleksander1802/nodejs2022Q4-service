@@ -21,7 +21,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto) {
     const newUser = this.usersService.create(createUserDto);
     const userWithoutSensitiveData = plainToClass(CreateUserDto, newUser, {
       excludePrefixes: ['password'],
