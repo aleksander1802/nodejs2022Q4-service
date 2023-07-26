@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { isString, isUUID } from 'class-validator';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -52,7 +52,7 @@ export class UsersService {
     }
   }
 
-  update(id: string, updatePasswordDto: UpdatePasswordDto): User {
+  update(id: string, updatePasswordDto: UpdateUserDto): User {
     const { newPassword, oldPassword } = updatePasswordDto;
 
     if (!id || !isUUID(id) || !isString(newPassword)) {

@@ -14,7 +14,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 import { plainToClass } from 'class-transformer';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UsersController {
@@ -40,10 +40,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
+  update(@Param('id') id: string, @Body() updatePasswordDto: UpdateUserDto) {
     const updatedUser = this.usersService.update(id, updatePasswordDto);
     const userWithoutPassword = { ...updatedUser, password: undefined };
     return userWithoutPassword;
