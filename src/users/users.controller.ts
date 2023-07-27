@@ -14,6 +14,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToClass } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UsersController {
@@ -22,10 +23,7 @@ export class UsersController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     const newUser = this.usersService.create(createUserDto);
-    const userWithoutSensitiveData = plainToClass(CreateUserDto, newUser, {
-      excludePrefixes: ['password'],
-    });
-    return userWithoutSensitiveData;
+    return plainToClass(User, newUser);
   }
 
   @Get()
@@ -44,8 +42,7 @@ export class UsersController {
     @Body() updatePasswordDto: UpdateUserDto,
   ) {
     const updatedUser = this.usersService.update(id, updatePasswordDto);
-    const userWithoutPassword = { ...updatedUser, password: undefined };
-    return userWithoutPassword;
+    return plainToClass(User, updatedUser);
   }
 
   @Delete(':id')
