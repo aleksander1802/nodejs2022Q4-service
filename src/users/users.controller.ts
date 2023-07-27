@@ -6,13 +6,12 @@ import {
   Param,
   Delete,
   Put,
-  ValidationPipe,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-
 import { plainToClass } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -35,12 +34,15 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updatePasswordDto: UpdateUserDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updatePasswordDto: UpdateUserDto,
+  ) {
     const updatedUser = this.usersService.update(id, updatePasswordDto);
     const userWithoutPassword = { ...updatedUser, password: undefined };
     return userWithoutPassword;
@@ -48,7 +50,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ValidationPipe) id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     this.usersService.remove(id);
   }
 }

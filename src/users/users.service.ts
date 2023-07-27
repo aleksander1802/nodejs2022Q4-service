@@ -7,8 +7,8 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
-import { isString, isUUID } from 'class-validator';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { isString } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -39,10 +39,6 @@ export class UsersService {
   }
 
   findOne(id: string): User {
-    if (!id || !isUUID(id)) {
-      throw new BadRequestException('Invalid UUID');
-    }
-
     const currentUser = this.users.find((user) => user.id === id);
 
     if (currentUser) {
@@ -55,8 +51,8 @@ export class UsersService {
   update(id: string, updatePasswordDto: UpdateUserDto): User {
     const { newPassword, oldPassword } = updatePasswordDto;
 
-    if (!id || !isUUID(id) || !isString(newPassword)) {
-      throw new BadRequestException('Invalid UUID');
+    if (!isString(newPassword)) {
+      throw new BadRequestException('Invalid dto');
     }
 
     const user = this.users.find((user) => user.id === id);
@@ -78,10 +74,6 @@ export class UsersService {
   }
 
   remove(id: string) {
-    if (!id || !isUUID(id)) {
-      throw new BadRequestException('Invalid UUID');
-    }
-
     const user = this.users.find((user) => user.id === id);
     if (user) {
       this.users = this.users.filter((user) => user.id !== id);
