@@ -4,9 +4,11 @@ import { SwaggerModule, OpenAPIObject } from '@nestjs/swagger';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
 
   const apiDocument = load(
     readFileSync(join(__dirname, '../doc/api.yaml'), 'utf8'),

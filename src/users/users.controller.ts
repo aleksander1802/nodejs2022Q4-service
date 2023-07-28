@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,7 +22,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     const newUser = this.usersService.create(createUserDto);
     return plainToClass(User, newUser);
   }
@@ -39,9 +40,9 @@ export class UsersController {
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updatePasswordDto: UpdateUserDto,
+    @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
-    const updatedUser = this.usersService.update(id, updatePasswordDto);
+    const updatedUser = this.usersService.update(id, updateUserDto);
     return plainToClass(User, updatedUser);
   }
 

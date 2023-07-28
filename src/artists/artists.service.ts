@@ -37,11 +37,11 @@ export class ArtistsService {
   findOne(id: string) {
     const artist = db.artists.find((art) => art.id === id);
 
-    if (artist) {
-      return artist;
-    } else {
+    if (!artist) {
       throw new NotFoundException('Artist not found');
     }
+
+    return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
@@ -73,6 +73,14 @@ export class ArtistsService {
 
     if (artist) {
       db.artists = db.artists.filter((art) => art.id !== id);
+
+      db.tracks = db.tracks.map((t) =>
+        t.artistId === id ? { ...t, artistId: null } : t,
+      );
+
+      db.albums = db.albums.map((a) =>
+        a.artistId === id ? { ...a, artistId: null } : a,
+      );
     } else {
       throw new NotFoundException('Artist not found');
     }
