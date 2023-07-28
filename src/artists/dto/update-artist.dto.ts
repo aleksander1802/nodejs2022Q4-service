@@ -1,9 +1,3 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { CreateArtistDto } from './create-artist.dto';
 
-export class UpdateArtistDto {
-  @IsString()
-  newName: string;
-
-  @IsBoolean()
-  newGrammy: boolean;
-}
+export class UpdateArtistDto extends CreateArtistDto {}

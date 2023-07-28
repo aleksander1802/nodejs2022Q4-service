@@ -8,11 +8,10 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { isBoolean, isString } from 'class-validator';
+import { db } from 'src/database/db';
 
 @Injectable()
 export class ArtistsService {
-  private artists: Artist[] = [];
-
   create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
 
@@ -25,15 +24,18 @@ export class ArtistsService {
       name,
       grammy,
     };
+
+    db.artists.push(newArtist);
+
     return newArtist;
   }
 
   findAll() {
-    return this.artists;
+    return db.artists;
   }
 
   findOne(id: string) {
-    const artist = this.artists.find((art) => art.id === id);
+    const artist = db.artists.find((art) => art.id === id);
 
     if (artist) {
       return artist;
@@ -43,28 +45,34 @@ export class ArtistsService {
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    const { newName, newGrammy } = updateArtistDto;
+    const { name, grammy } = updateArtistDto;
 
-    if (!isString(newName) || !isBoolean(newGrammy)) {
+    if (!isString(name) || !isBoolean(grammy)) {
       throw new BadRequestException('Invalid dto');
     }
 
-    const artist = this.artists.find((art) => art.id === id);
+    const artist = db.artists.find((art) => art.id === id);
 
     if (artist) {
-      artist.name = newName;
+      const updatedArtist = {
+        ...artist,
+        name,
+        grammy,
+      };
 
-      return artist;
+      db.artists = db.artists.map((a) => (a.id === id ? updatedArtist : a));
+
+      return updatedArtist;
     } else {
       throw new NotFoundException('Artist not found');
     }
   }
 
   remove(id: string) {
-    const artist = this.artists.find((art) => art.id === id);
+    const artist = db.artists.find((art) => art.id === id);
 
     if (artist) {
-      this.artists = this.artists.filter((art) => art.id !== id);
+      db.artists = db.artists.filter((art) => art.id !== id);
     } else {
       throw new NotFoundException('Artist not found');
     }
