@@ -9,37 +9,38 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { isString } from 'class-validator';
+import { db } from 'src/database/db';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
-
   create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
+    const version = 1;
 
-    if (!login || !password) {
+    if (!isString(login) || !isString(password)) {
       throw new BadRequestException('Login and password are required fields');
     }
 
     const newUser: User = {
       id: uuidv4(),
-      login: login,
-      password: password,
-      version: 1,
+      login,
+      password,
+      version,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
 
-    this.users.push(newUser);
+    db.users.push(newUser);
+
     return newUser;
   }
 
   findAll(): User[] {
-    return this.users;
+    return db.users;
   }
 
   findOne(id: string): User {
-    const currentUser = this.users.find((user) => user.id === id);
+    const currentUser = db.users.find((user) => user.id === id);
 
     if (currentUser) {
       return currentUser;
@@ -55,28 +56,34 @@ export class UsersService {
       throw new BadRequestException('Invalid dto');
     }
 
-    const user = this.users.find((user) => user.id === id);
+    const user = db.users.find((user) => user.id === id);
 
     if (user) {
       const old = user.password;
+
       if (old !== oldPassword) {
         throw new ForbiddenException('Old password is wrong');
       }
 
-      user.password = newPassword;
-      user.version += 1;
-      user.updatedAt = Date.now();
+      const updateUser = {
+        ...user,
+        password: newPassword,
+        version: user.version + 1,
+        updatedAt: Date.now(),
+      };
 
-      return user;
+      db.users = db.users.map((u) => (u.id === id ? updateUser : u));
+
+      return updateUser;
     } else {
       throw new NotFoundException('User not found');
     }
   }
 
   remove(id: string) {
-    const user = this.users.find((user) => user.id === id);
+    const user = db.users.find((user) => user.id === id);
     if (user) {
-      this.users = this.users.filter((user) => user.id !== id);
+      db.users = db.users.filter((user) => user.id !== id);
     } else {
       throw new NotFoundException('User not found');
     }
