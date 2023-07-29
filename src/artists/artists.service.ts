@@ -1,23 +1,14 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { isBoolean, isString } from 'class-validator';
 import { db } from 'src/database/db';
 
 @Injectable()
 export class ArtistsService {
   create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
-
-    if (!name || !grammy) {
-      throw new BadRequestException('Name and grammy are required fields');
-    }
 
     const newArtist: Artist = {
       id: uuidv4(),
@@ -46,10 +37,6 @@ export class ArtistsService {
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
     const { name, grammy } = updateArtistDto;
-
-    if (!isString(name) || !isBoolean(grammy)) {
-      throw new BadRequestException('Invalid dto');
-    }
 
     const artist = db.artists.find((art) => art.id === id);
 
@@ -80,6 +67,10 @@ export class ArtistsService {
 
       db.albums = db.albums.map((a) =>
         a.artistId === id ? { ...a, artistId: null } : a,
+      );
+
+      db.favorites.artists = db.favorites.artists.filter(
+        (artistId) => artistId !== id,
       );
     } else {
       throw new NotFoundException('Artist not found');

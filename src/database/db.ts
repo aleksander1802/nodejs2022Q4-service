@@ -5,4 +5,9 @@ export const db: Database = {
   artists: [],
   tracks: [],
   albums: [],
+  favorites: {
+    artists: [],
+    albums: [],
+    tracks: [],
+  },
 };

@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
-  ValidationPipe,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -20,7 +19,7 @@ export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
-  create(@Body(new ValidationPipe()) createTrackDto: CreateTrackDto) {
+  create(@Body() createTrackDto: CreateTrackDto) {
     return this.tracksService.create(createTrackDto);
   }
 
@@ -37,7 +36,7 @@ export class TracksController {
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body(new ValidationPipe()) updateTrackDto: UpdateTrackDto,
+    @Body() updateTrackDto: UpdateTrackDto,
   ) {
     return this.tracksService.update(id, updateTrackDto);
   }

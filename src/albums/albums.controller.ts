@@ -8,7 +8,6 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
-  ValidationPipe,
   Put,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
@@ -20,7 +19,7 @@ export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  create(@Body(new ValidationPipe()) createAlbumDto: CreateAlbumDto) {
+  create(@Body() createAlbumDto: CreateAlbumDto) {
     return this.albumsService.create(createAlbumDto);
   }
 
@@ -37,7 +36,7 @@ export class AlbumsController {
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body(new ValidationPipe()) updateAlbumDto: UpdateAlbumDto,
+    @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
     return this.albumsService.update(id, updateAlbumDto);
   }

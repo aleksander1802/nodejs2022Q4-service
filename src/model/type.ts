@@ -8,4 +8,11 @@ export interface Database {
   artists: Artist[];
   tracks: Track[];
   albums: Album[];
+  favorites: Favorites;
+}
+
+export interface Favorites {
+  artists: string[];
+  albums: string[];
+  tracks: string[];
 }
