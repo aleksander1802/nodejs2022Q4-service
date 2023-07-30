@@ -49,10 +49,10 @@ export class UsersController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get users',
+    summary: 'Get all users',
     description: 'Get all users',
   })
-  @ApiOkResponse({ description: 'Success', type: [User] })
+  @ApiOkResponse({ description: 'Successful operation', type: [User] })
   findAll() {
     const users = this.usersService.findAll();
     return plainToInstance(User, users);
@@ -60,12 +60,12 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get user',
-    description: 'Get the specified user by his ID',
+    summary: 'Get single user by id',
+    description: 'Get single user by id',
   })
-  @ApiOkResponse({ description: 'Success', type: User })
+  @ApiOkResponse({ description: 'Successful operation', type: User })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -75,13 +75,13 @@ export class UsersController {
 
   @Put(':id')
   @ApiOperation({
-    summary: 'Update password',
-    description: "Update user's password by his ID",
+    summary: "Update a user's password",
+    description: "Updates a user's password by ID",
   })
-  @ApiOkResponse({ description: 'The password has been updated' })
-  @ApiForbiddenResponse({ description: 'Old password is wrong', type: User })
+  @ApiOkResponse({ description: 'The user has been updated.' })
+  @ApiForbiddenResponse({ description: 'oldPassword is wrong', type: User })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   update(
@@ -95,11 +95,11 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({
     summary: 'Delete user',
-    description: 'Delete the specified user by his ID',
+    description: 'Deletes user by ID.',
   })
-  @ApiNoContentResponse({ description: 'Success' })
+  @ApiNoContentResponse({ description: 'The user has been deleted' })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
