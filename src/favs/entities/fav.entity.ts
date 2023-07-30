@@ -4,12 +4,12 @@ import { Artist } from 'src/artists/entities/artist.entity';
 import { Track } from 'src/tracks/entities/track.entity';
 
 export class Fav {
-  @ApiProperty({ type: () => [Artist] })
+  @ApiProperty()
   artists: Artist[];
 
-  @ApiProperty({ type: () => [Album] })
+  @ApiProperty()
   albums: Album[];
 
-  @ApiProperty({ type: () => [Track] })
+  @ApiProperty()
   tracks: Track[];
 }

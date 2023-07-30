@@ -31,11 +31,11 @@ export class TracksController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create track',
-    description: 'Create a new track',
+    summary: 'Add new track',
+    description: 'Add new track information',
   })
   @ApiCreatedResponse({
-    description: 'The track has been created',
+    description: 'Successful operation',
     type: Track,
   })
   @ApiBadRequestResponse({
@@ -47,38 +47,38 @@ export class TracksController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get tracks',
-    description: 'Get all tracks',
+    summary: 'Get tracks list',
+    description: 'Gets all library tracks list',
   })
-  @ApiOkResponse({ description: 'Success', type: [Track] })
+  @ApiOkResponse({ description: 'Successful operation', type: [Track] })
   findAll() {
     return this.tracksService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get track',
-    description: 'Get the specified track by ID',
+    summary: 'Get single track by id',
+    description: 'Gets single track by id',
   })
-  @ApiOkResponse({ description: 'Success', type: Track })
+  @ApiOkResponse({ description: 'Successful operation', type: Track })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. trackId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Track not found' })
+  @ApiNotFoundResponse({ description: 'Track was not found.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.tracksService.findOne(id);
   }
 
   @Put(':id')
   @ApiOperation({
-    summary: 'Update track',
-    description: 'Update track info by ID',
+    summary: 'Update track information',
+    description: 'Update library track information by UUID',
   })
   @ApiOkResponse({ description: 'The track has been updated', type: Track })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. trackId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Track not found' })
+  @ApiNotFoundResponse({ description: 'Track was not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
@@ -89,13 +89,13 @@ export class TracksController {
   @Delete(':id')
   @ApiOperation({
     summary: 'Delete track',
-    description: 'Delete the specified track by ID',
+    description: 'Delete track from library',
   })
-  @ApiNoContentResponse({ description: 'Success' })
+  @ApiNoContentResponse({ description: 'Deleted successfully' })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. trackId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Track not found' })
+  @ApiNotFoundResponse({ description: 'Track was not found.' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.tracksService.remove(id);
