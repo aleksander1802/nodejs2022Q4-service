@@ -18,21 +18,18 @@ export class User {
 
   @ApiPropertyOptional({
     required: false,
-    type: 'number',
     example: 1,
   })
   version: number;
 
   @ApiPropertyOptional({
     required: false,
-    type: 'number',
     example: 1655000000,
   })
   createdAt: number;
 
   @ApiPropertyOptional({
     required: false,
-    type: 'number',
     example: 1655000000,
   })
   updatedAt: number;

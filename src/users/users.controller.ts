@@ -49,7 +49,7 @@ export class UsersController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get all users',
+    summary: 'Get users',
     description: 'Get all users',
   })
   @ApiOkResponse({ description: 'Success', type: [User] })
