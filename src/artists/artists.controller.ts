@@ -74,7 +74,7 @@ export class ArtistsController {
     summary: 'Update artist info',
     description: "Update artist's info by his ID",
   })
-  @ApiOkResponse({ description: 'The password has been updated' })
+  @ApiOkResponse({ description: 'The artist has been updated', type: Artist })
   @ApiBadRequestResponse({
     description: 'Bad request. Invalid ID',
   })
