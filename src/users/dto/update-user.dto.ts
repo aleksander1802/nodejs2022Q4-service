@@ -3,6 +3,7 @@ import { IsString, IsNotEmpty } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
+    required: true,
     description: 'Old password',
   })
   @IsNotEmpty()
@@ -10,6 +11,7 @@ export class UpdateUserDto {
   oldPassword: string;
 
   @ApiProperty({
+    required: true,
     description: 'New  password',
   })
   @IsNotEmpty()
