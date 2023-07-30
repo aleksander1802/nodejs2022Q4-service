@@ -31,15 +31,15 @@ export class ArtistsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create artist',
-    description: 'Create a new artist',
+    summary: 'Add new artist',
+    description: 'Add new artist',
   })
   @ApiCreatedResponse({
-    description: 'The artist has been created',
+    description: 'Successful operation',
     type: Artist,
   })
   @ApiBadRequestResponse({
-    description: 'Bad request. Body does not contain required fields',
+    description: 'Bad request. body does not contain required fields',
   })
   create(@Body() createArtistDto: CreateArtistDto) {
     return this.artistsService.create(createArtistDto);
@@ -47,38 +47,38 @@ export class ArtistsController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get artists',
+    summary: 'Get all artists',
     description: 'Get all artists',
   })
-  @ApiOkResponse({ description: 'Success', type: [Artist] })
+  @ApiOkResponse({ description: 'Successful operation', type: [Artist] })
   findAll() {
     return this.artistsService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get artist',
-    description: 'Get the specified artist by his ID',
+    summary: 'Get single artist by id',
+    description: 'Get single artist by id',
   })
-  @ApiOkResponse({ description: 'Success', type: Artist })
+  @ApiOkResponse({ description: 'Successful operation', type: Artist })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ description: 'Artist was not found.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.artistsService.findOne(id);
   }
 
   @Put(':id')
   @ApiOperation({
-    summary: 'Update artist info',
-    description: "Update artist's info by his ID",
+    summary: 'Update artist information',
+    description: 'Update artist information by UUID',
   })
   @ApiOkResponse({ description: 'The artist has been updated', type: Artist })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ description: 'Artist was not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
@@ -89,13 +89,13 @@ export class ArtistsController {
   @Delete(':id')
   @ApiOperation({
     summary: 'Delete artist',
-    description: 'Delete the specified artist by his ID',
+    description: 'Delete artist from library',
   })
-  @ApiNoContentResponse({ description: 'Success' })
+  @ApiNoContentResponse({ description: 'Deleted successfully' })
   @ApiBadRequestResponse({
-    description: 'Bad request. Invalid ID',
+    description: 'Bad request. artistId is invalid (not uuid)',
   })
-  @ApiNotFoundResponse({ description: 'Artist not found' })
+  @ApiNotFoundResponse({ description: 'Artist was not found.' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.artistsService.remove(id);
