@@ -24,13 +24,13 @@ export class User {
 
   @ApiPropertyOptional({
     required: false,
-    example: 1655000000,
+    example: new Date(),
   })
-  createdAt: number;
+  createdAt: Date;
 
   @ApiPropertyOptional({
     required: false,
-    example: 1655000000,
+    example: new Date(),
   })
-  updatedAt: number;
+  updatedAt: Date;
 }

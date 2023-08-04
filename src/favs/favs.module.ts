@@ -4,9 +4,10 @@ import { FavsController } from './favs.controller';
 import { ArtistsModule } from 'src/artists/artists.module';
 import { AlbumsModule } from 'src/albums/albums.module';
 import { TracksModule } from 'src/tracks/tracks.module';
+import { PrismaModule } from 'nestjs-prisma';
 
 @Module({
-  imports: [ArtistsModule, AlbumsModule, TracksModule],
+  imports: [ArtistsModule, AlbumsModule, TracksModule, PrismaModule],
   controllers: [FavsController],
   providers: [FavsService],
 })

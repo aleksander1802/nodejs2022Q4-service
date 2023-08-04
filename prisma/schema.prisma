@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        String   @id @default(uuid())
+  login     String
+  password  String
+  version   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Artist {
+  id        String    @id @default(uuid())
+  name      String
+  grammy    Boolean
+  albums    Album[]   @relation("ArtistToAlbum")
+  tracks    Track[]   @relation("ArtistToTrack")
+  favorites Favorites? @relation("ArtistToFavorites", fields: [favoritesId], references: [id])
+  favoritesId String?
+}
+
+model Album {
+  id          String   @id @default(uuid())
+  name        String
+  year        Int
+  artist      Artist?  @relation("ArtistToAlbum", fields: [artistId], references: [id])
+  artistId    String?
+  tracks      Track[]  @relation("AlbumToTrack")
+  favorites   Favorites? @relation("AlbumToFavorites", fields: [favoritesId], references: [id])
+  favoritesId String?
+}
+
+model Track {
+  id          String   @id @default(uuid())
+  name        String
+  artist      Artist?  @relation("ArtistToTrack", fields: [artistId], references: [id])
+  artistId    String?
+  album       Album?   @relation("AlbumToTrack", fields: [albumId], references: [id])
+  albumId     String?
+  duration    Int
+  favorites   Favorites? @relation("TrackToFavorites", fields: [favoritesId], references: [id])
+  favoritesId String?
+}
+
+model Favorites {
+  id       String   @id @default(uuid())
+  artists  Artist[]  @relation("ArtistToFavorites")
+  albums   Album[]   @relation("AlbumToFavorites")
+  tracks   Track[]   @relation("TrackToFavorites")
+}

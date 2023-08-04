@@ -1,32 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { db } from 'src/database/db';
+import { Artist } from '.prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
 export class ArtistsService {
-  create(createArtistDto: CreateArtistDto) {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
     const { name, grammy } = createArtistDto;
 
-    const newArtist: Artist = {
-      id: uuidv4(),
-      name,
-      grammy,
-    };
-
-    db.artists.push(newArtist);
-
-    return newArtist;
+    return this.prisma.artist.create({
+      data: {
+        name,
+        grammy,
+      },
+    });
   }
 
-  findAll() {
-    return db.artists;
+  async findAll(): Promise<Artist[]> {
+    return this.prisma.artist.findMany();
   }
 
-  findOne(id: string) {
-    const artist = db.artists.find((art) => art.id === id);
+  async findOne(id: string): Promise<Artist> {
+    const artist = await this.prisma.artist.findUnique({
+      where: { id },
+    });
 
     if (!artist) {
       throw new NotFoundException('Artist not found');
@@ -35,43 +35,63 @@ export class ArtistsService {
     return artist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
     const { name, grammy } = updateArtistDto;
 
-    const artist = db.artists.find((art) => art.id === id);
+    const artist = await this.prisma.artist.findUnique({
+      where: { id },
+    });
 
     if (artist) {
-      const updatedArtist = {
-        ...artist,
-        name,
-        grammy,
-      };
-
-      db.artists = db.artists.map((a) => (a.id === id ? updatedArtist : a));
-
-      return updatedArtist;
+      return this.prisma.artist.update({
+        where: { id },
+        data: {
+          name,
+          grammy,
+        },
+      });
     } else {
       throw new NotFoundException('Artist not found');
     }
   }
 
-  remove(id: string) {
-    const artist = db.artists.find((art) => art.id === id);
+  async remove(id: string): Promise<void> {
+    const artist = await this.prisma.artist.findUnique({
+      where: { id },
+      include: {
+        favorites: true,
+      },
+    });
 
     if (artist) {
-      db.artists = db.artists.filter((art) => art.id !== id);
+      await this.prisma.artist.delete({
+        where: { id },
+      });
 
-      db.tracks = db.tracks.map((t) =>
-        t.artistId === id ? { ...t, artistId: null } : t,
-      );
+      if (artist.favorites && artist.favorites.id) {
+        await this.prisma.favorites.update({
+          where: { id: artist.favorites.id },
+          data: {
+            artists: {
+              disconnect: { id },
+            },
+          },
+        });
+      }
 
-      db.albums = db.albums.map((a) =>
-        a.artistId === id ? { ...a, artistId: null } : a,
-      );
+      await this.prisma.track.updateMany({
+        where: { artistId: id },
+        data: {
+          artistId: null,
+        },
+      });
 
-      db.favorites.artists = db.favorites.artists.filter(
-        (artistId) => artistId !== id,
-      );
+      await this.prisma.album.updateMany({
+        where: { artistId: id },
+        data: {
+          artistId: null,
+        },
+      });
     } else {
       throw new NotFoundException('Artist not found');
     }

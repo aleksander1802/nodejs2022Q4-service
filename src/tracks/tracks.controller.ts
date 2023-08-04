@@ -13,6 +13,7 @@ import {
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -41,7 +42,7 @@ export class TracksController {
   @ApiBadRequestResponse({
     description: 'Bad request. Body does not contain required fields',
   })
-  create(@Body() createTrackDto: CreateTrackDto) {
+  async create(@Body() createTrackDto: CreateTrackDto): Promise<Track> {
     return this.tracksService.create(createTrackDto);
   }
 
@@ -51,7 +52,7 @@ export class TracksController {
     description: 'Gets all library tracks list',
   })
   @ApiOkResponse({ description: 'Successful operation', type: [Track] })
-  findAll() {
+  async findAll(): Promise<Track[]> {
     return this.tracksService.findAll();
   }
 
@@ -65,7 +66,7 @@ export class TracksController {
     description: 'Bad request. trackId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'Track was not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
     return this.tracksService.findOne(id);
   }
 
@@ -74,15 +75,18 @@ export class TracksController {
     summary: 'Update track information',
     description: 'Update library track information by UUID',
   })
-  @ApiOkResponse({ description: 'The track has been updated', type: Track })
+  @ApiOkResponse({
+    description: 'The track has been updated',
+    type: Track,
+  })
   @ApiBadRequestResponse({
     description: 'Bad request. trackId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'Track was not found.' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
-  ) {
+  ): Promise<Track> {
     return this.tracksService.update(id, updateTrackDto);
   }
 
@@ -97,7 +101,7 @@ export class TracksController {
   })
   @ApiNotFoundResponse({ description: 'Track was not found.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.tracksService.remove(id);
   }
 }

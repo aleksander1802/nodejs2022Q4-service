@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -26,6 +26,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { User } from './entities/user.entity';
 
 @ApiTags('Users')
 @Controller('user')
@@ -42,8 +43,8 @@ export class UsersController {
     description: 'Bad request. Body does not contain required fields',
   })
   @ApiUnauthorizedResponse({ description: 'The user is not authorized' })
-  create(@Body() createUserDto: CreateUserDto) {
-    const newUser = this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const newUser = await this.usersService.create(createUserDto);
     return plainToClass(User, newUser);
   }
 
@@ -53,9 +54,9 @@ export class UsersController {
     description: 'Get all users',
   })
   @ApiOkResponse({ description: 'Successful operation', type: [User] })
-  findAll() {
-    const users = this.usersService.findAll();
-    return plainToInstance(User, users);
+  async findAll() {
+    const users = await this.usersService.findAll();
+    return plainToClass(User, users);
   }
 
   @Get(':id')
@@ -68,8 +69,8 @@ export class UsersController {
     description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const user = this.usersService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.usersService.findOne(id);
     return plainToClass(User, user);
   }
 
@@ -84,11 +85,11 @@ export class UsersController {
     description: 'Bad request. userId is invalid (not uuid)',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const updatedUser = this.usersService.update(id, updateUserDto);
+    const updatedUser = await this.usersService.update(id, updateUserDto);
     return plainToClass(User, updatedUser);
   }
 
@@ -103,7 +104,7 @@ export class UsersController {
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    this.usersService.remove(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    await this.usersService.remove(id);
   }
 }
