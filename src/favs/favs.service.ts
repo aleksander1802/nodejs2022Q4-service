@@ -4,8 +4,11 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Artist, Album, Track } from '@prisma/client';
+
 import { Favorites } from './favorites';
+import { Track } from 'src/tracks/entities/track.entity';
+import { Album } from 'src/albums/entities/album.entity';
+import { Artist } from 'src/artists/entities/artist.entity';
 
 @Injectable()
 export class FavsService {
