@@ -6,9 +6,9 @@ import {
 import { PrismaService } from 'nestjs-prisma';
 
 import { Favorites } from './favorites';
-import { Track } from 'src/tracks/entities/track.entity';
-import { Album } from 'src/albums/entities/album.entity';
-import { Artist } from 'src/artists/entities/artist.entity';
+import { Artist } from '@prisma/client';
+import { Album } from '@prisma/client';
+import { Track } from '@prisma/client';
 
 @Injectable()
 export class FavsService {

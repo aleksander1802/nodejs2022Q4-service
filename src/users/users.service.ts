@@ -16,7 +16,7 @@ export class UsersService {
     const { login, password } = createUserDto;
     const version = 1;
 
-    return this.prisma.user.create({
+    const newUser = await this.prisma.user.create({
       data: {
         login,
         password,
@@ -25,10 +25,24 @@ export class UsersService {
         updatedAt: new Date(),
       },
     });
+
+    const modifiedUser = {
+      ...newUser,
+      createdAt: newUser.createdAt.getTime(),
+      updatedAt: newUser.updatedAt.getTime(),
+    };
+
+    return modifiedUser;
   }
 
   async findAll(): Promise<User[]> {
-    return this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany();
+
+    return users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    }));
   }
 
   async findOne(id: string): Promise<User> {
@@ -40,7 +54,13 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const modifiedUser = {
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    };
+
+    return modifiedUser;
   }
 
   async update(id: string, updatePasswordDto: UpdateUserDto): Promise<User> {
@@ -58,7 +78,7 @@ export class UsersService {
       throw new ForbiddenException('Old password is wrong');
     }
 
-    const updateUser = await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
         password: newPassword,
@@ -67,7 +87,11 @@ export class UsersService {
       },
     });
 
-    return updateUser;
+    return {
+      ...updatedUser,
+      createdAt: updatedUser.createdAt.getTime(),
+      updatedAt: updatedUser.updatedAt.getTime(),
+    };
   }
 
   async remove(id: string): Promise<void> {

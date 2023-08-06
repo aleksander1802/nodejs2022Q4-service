@@ -1,32 +1,29 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider      = "prisma-client-js"  
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
-
 
 model User {
-  id        String   @id @default(uuid())
-  login     String
-  password  String
-  version   Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  login       String
+  password    String
+  version     Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt 
 }
 
+
 model Artist {
-  id        String    @id @default(uuid())
-  name      String
-  grammy    Boolean
-  albums    Album[]   @relation("ArtistToAlbum")
-  tracks    Track[]   @relation("ArtistToTrack")
-  favorites Favorites? @relation("ArtistToFavorites", fields: [favoritesId], references: [id])
+  id          String    @id @default(uuid())
+  name        String
+  grammy      Boolean?
+  albums      Album[]   @relation("ArtistToAlbum")
+  tracks      Track[]   @relation("ArtistToTrack")
+  favorites   Favorites? @relation("ArtistToFavorites", fields: [favoritesId], references: [id])
   favoritesId String?
 }
 

@@ -14,7 +14,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Artist" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "grammy" BOOLEAN NOT NULL,
+    "grammy" BOOLEAN,
     "favoritesId" TEXT,
 
     CONSTRAINT "Artist_pkey" PRIMARY KEY ("id")
