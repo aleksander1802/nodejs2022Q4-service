@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { PrismaService } from 'nestjs-prisma';
 import { Album } from '@prisma/client';
 
 @Injectable()
@@ -13,9 +13,9 @@ export class AlbumsService {
 
     return this.prisma.album.create({
       data: {
+        artistId: artistId || null,
         name,
         year,
-        artistId: artistId || null,
       },
     });
   }
@@ -29,11 +29,11 @@ export class AlbumsService {
       where: { id },
     });
 
-    if (!album) {
+    if (album) {
+      return album;
+    } else {
       throw new NotFoundException('Album not found');
     }
-
-    return album;
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
@@ -43,23 +43,24 @@ export class AlbumsService {
       where: { id },
     });
 
-    if (!currentAlbum) {
+    if (currentAlbum) {
+      return this.prisma.album.update({
+        where: { id },
+        data: {
+          artistId: artistId || null,
+          name,
+          year,
+        },
+      });
+    } else {
       throw new NotFoundException('Album not found');
     }
-
-    return this.prisma.album.update({
-      where: { id },
-      data: {
-        artistId,
-        name,
-        year,
-      },
-    });
   }
 
   async remove(id: string): Promise<void> {
     const currentAlbum = await this.prisma.album.findUnique({
       where: { id },
+      include: { tracks: true, favorites: { select: { id: true } } },
     });
 
     if (currentAlbum) {
@@ -67,21 +68,19 @@ export class AlbumsService {
         where: { id },
       });
 
-      await this.prisma.track.updateMany({
-        where: { albumId: id },
-        data: { albumId: null },
-      });
+      if (currentAlbum.tracks.length > 0) {
+        await this.prisma.track.updateMany({
+          where: { albumId: id },
+          data: { albumId: null },
+        });
+      }
 
-      await this.prisma.favorites.update({
-        where: { id: currentAlbum.favoritesId },
-        data: {
-          albums: {
-            disconnect: {
-              id,
-            },
-          },
-        },
-      });
+      if (currentAlbum.favorites) {
+        await this.prisma.favorites.update({
+          where: { id: currentAlbum.favorites.id },
+          data: { albums: { disconnect: { id } } },
+        });
+      }
     } else {
       throw new NotFoundException('Album not found');
     }
