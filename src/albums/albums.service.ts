@@ -60,27 +60,12 @@ export class AlbumsService {
   async remove(id: string): Promise<void> {
     const currentAlbum = await this.prisma.album.findUnique({
       where: { id },
-      include: { tracks: true, favorites: { select: { id: true } } },
     });
 
     if (currentAlbum) {
       await this.prisma.album.delete({
         where: { id },
       });
-
-      if (currentAlbum.tracks.length > 0) {
-        await this.prisma.track.updateMany({
-          where: { albumId: id },
-          data: { albumId: null },
-        });
-      }
-
-      if (currentAlbum.favorites) {
-        await this.prisma.favorites.update({
-          where: { id: currentAlbum.favorites.id },
-          data: { albums: { disconnect: { id } } },
-        });
-      }
     } else {
       throw new NotFoundException('Album not found');
     }

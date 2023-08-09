@@ -58,39 +58,11 @@ export class ArtistsService {
   async remove(id: string): Promise<void> {
     const artist = await this.prisma.artist.findUnique({
       where: { id },
-      include: {
-        favorites: true,
-      },
     });
 
     if (artist) {
       await this.prisma.artist.delete({
         where: { id },
-      });
-
-      if (artist.favorites && artist.favorites.id) {
-        await this.prisma.favorites.update({
-          where: { id: artist.favorites.id },
-          data: {
-            artists: {
-              disconnect: { id },
-            },
-          },
-        });
-      }
-
-      await this.prisma.track.updateMany({
-        where: { artistId: id },
-        data: {
-          artistId: null,
-        },
-      });
-
-      await this.prisma.album.updateMany({
-        where: { artistId: id },
-        data: {
-          artistId: null,
-        },
       });
     } else {
       throw new NotFoundException('Artist not found');

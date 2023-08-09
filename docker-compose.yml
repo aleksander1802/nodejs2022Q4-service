@@ -3,18 +3,13 @@ version: '3'
 services:
   app:
     build:
-      context: .      
+      context: .
     container_name: my_nest_app
     restart: always
     ports:
       - '4000:3000'
     environment:
-      - DATABASE_URL=postgresql://admin:admin@my_postgres_db:5432/mydb
-      - CRYPT_SALT=10
-      - JWT_SECRET_KEY=secret123123
-      - JWT_SECRET_REFRESH_KEY=secret123123
-      - TOKEN_EXPIRE_TIME=1h
-      - TOKEN_REFRESH_EXPIRE_TIME=24h
+      DATABASE_URL: ${POSTGRES_DB}
     depends_on:
       - db
     networks:
@@ -25,9 +20,9 @@ services:
     container_name: my_postgres_db
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES}
     ports:
       - '5432:5432'
     volumes:

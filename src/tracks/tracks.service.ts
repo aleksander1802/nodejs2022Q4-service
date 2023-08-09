@@ -62,26 +62,12 @@ export class TracksService {
   async remove(id: string): Promise<void> {
     const currentTrack = await this.prisma.track.findUnique({
       where: { id },
-      include: { favorites: true },
     });
 
     if (currentTrack) {
       await this.prisma.track.delete({
         where: { id },
       });
-
-      if (currentTrack.favorites) {
-        await this.prisma.favorites.update({
-          where: { id: currentTrack.favorites.id },
-          data: {
-            tracks: {
-              disconnect: {
-                id,
-              },
-            },
-          },
-        });
-      }
     } else {
       throw new NotFoundException('Track not found');
     }
