@@ -1,10 +1,25 @@
-FROM node:18-alpine AS build
+ARG NODE_VERSION=18.16.0
 
-WORKDIR /app
+FROM node:${NODE_VERSION}-alpine as base
 
-COPY package*.json ./
+WORKDIR /usr/src/app
 
-RUN npm install --production
+COPY prisma /usr/src/app/prisma
+COPY test /usr/src/app/test
+
+FROM base as deps
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
+
+FROM deps as build
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 
@@ -12,19 +27,21 @@ RUN npx prisma generate
 
 RUN npm run build
 
-RUN npm cache clean --force
+FROM base as final
 
-FROM node:18-alpine
+ENV NODE_ENV production
 
-WORKDIR /app
+USER node
 
-COPY --from=build /app/ .
+COPY package.json .
 
-RUN npm install --production
+COPY test ./test
+COPY prisma ./prisma
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/test ./test
+COPY doc ./doc
 
-RUN npm install @nestjs/config
+EXPOSE 4000
 
-EXPOSE 3000
-
-CMD ["node", "dist/main.js"]
-
+CMD npm run start:docker

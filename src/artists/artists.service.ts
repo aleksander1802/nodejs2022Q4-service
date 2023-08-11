@@ -2,13 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { PrismaService } from 'nestjs-prisma';
-import { Artist } from '@prisma/client';
 
 @Injectable()
 export class ArtistsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
+  async create(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
 
     return this.prisma.artist.create({
@@ -19,11 +18,11 @@ export class ArtistsService {
     });
   }
 
-  async findAll(): Promise<Artist[]> {
+  async findAll() {
     return this.prisma.artist.findMany();
   }
 
-  async findOne(id: string): Promise<Artist> {
+  async findOne(id: string) {
     const artist = await this.prisma.artist.findUnique({
       where: { id },
     });
@@ -35,7 +34,7 @@ export class ArtistsService {
     return artist;
   }
 
-  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
     const { name, grammy } = updateArtistDto;
 
     const artist = await this.prisma.artist.findUnique({

@@ -1,34 +1,44 @@
 version: '3'
 
 services:
-  app:
+  localhost:
     build:
       context: .
+      args:
+        - DATABASE_URL=${DATABASE_URL}
     container_name: my_nest_app
     restart: always
     ports:
-      - '4000:3000'
+      - '4000:4000'
     environment:
-      DATABASE_URL: ${POSTGRES_DB}
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - my_network
 
   db:
-    image: postgres:latest
+    image: postgres
     container_name: my_postgres_db
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - my_network
+    expose:
+      - 5432
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'admin', '-d', 'mydb']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

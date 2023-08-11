@@ -2,13 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { PrismaService } from 'nestjs-prisma';
-import { Track } from '@prisma/client';
 
 @Injectable()
 export class TracksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createTrackDto: CreateTrackDto): Promise<Track> {
+  async create(createTrackDto: CreateTrackDto) {
     const { name, duration, artistId, albumId } = createTrackDto;
 
     return this.prisma.track.create({
@@ -21,11 +20,11 @@ export class TracksService {
     });
   }
 
-  async findAll(): Promise<Track[]> {
+  async findAll() {
     return this.prisma.track.findMany();
   }
 
-  async findOne(id: string): Promise<Track> {
+  async findOne(id: string) {
     const track = await this.prisma.track.findUnique({
       where: { id },
     });
@@ -37,7 +36,7 @@ export class TracksService {
     }
   }
 
-  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
     const { name, artistId, albumId, duration } = updateTrackDto;
 
     const currentTrack = await this.prisma.track.findUnique({
