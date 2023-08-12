@@ -4,10 +4,13 @@ services:
   localhost:
     build:
       context: .
+      target: development
       args:
         - DATABASE_URL=${DATABASE_URL}
     container_name: my_nest_app
     restart: always
+    volumes:
+      - ./src:/usr/src/app/src      
     ports:
       - '4000:4000'
     environment:
