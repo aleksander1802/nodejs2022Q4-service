@@ -11,6 +11,7 @@ services:
     restart: always
     volumes:
       - ./src:/usr/src/app/src
+      - app_logs:/usr/src/app/logs
     ports:
       - '${PORT}:${PORT}'
     environment:
@@ -33,6 +34,7 @@ services:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
     networks:
       - my_network
     expose:
@@ -45,6 +47,8 @@ services:
 
 volumes:
   postgres_data:
+  postgres_logs:
+  app_logs:
 
 networks:
   my_network:
@@ -54,4 +58,4 @@ networks:
       config:
         - subnet: ${SUBNET}
           gateway: ${GATEWAY}
-          ip_range: ${IP_RANGE}    
+          ip_range: ${IP_RANGE}
