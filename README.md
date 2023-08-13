@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone https://github.com/aleksander1802/nodejs2023Q2-service/tree/develop_part2
+git clone https://github.com/aleksander1802/nodejs2023Q2-service.git
 ```
 
 ## Switch to the develop branch
