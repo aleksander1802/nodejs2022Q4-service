@@ -1,4 +1,4 @@
-# Home Library Service
+# Home Library Service Part 2
 
 ## Prerequisites
 
@@ -8,7 +8,13 @@
 ## Downloading
 
 ```
-git clone https://github.com/aleksander1802/nodejs2023Q2-service.git
+git clone https://github.com/aleksander1802/nodejs2023Q2-service/tree/develop_part2
+```
+
+## Switch to the develop branch
+
+```
+git checkout develop_part2
 ```
 
 ## Installing NPM modules
@@ -17,10 +23,16 @@ git clone https://github.com/aleksander1802/nodejs2023Q2-service.git
 npm install
 ```
 
-## Running application
+## Running application in detached mode (highly recommended)
 
 ```
-npm start
+docker-compose up -d
+```
+
+## Or running application in attached mode (in this case, you will have to run commands in another terminal)
+
+```
+docker-compose up
 ```
 
 After starting the app on port (4000 as default) you can open
@@ -29,10 +41,18 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
-After application running open new terminal and enter:
+After application running open new terminal (in attached mode) and enter:
 
 ```
 npm run test
+```
+
+## Checking for vulnerabilities (in some cases, you may need to start VPN)
+
+After application running open new terminal (in attached mode) and enter:
+
+```
+npm run start:scout
 ```
 
 ### Auto-fix and format
