@@ -7,6 +7,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -14,25 +15,28 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const version = 1;
 
     const newUser = await this.prisma.user.create({
       data: {
         login,
-        password,
+        password: hashedPassword,
         version,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
-    const modifiedUser = {
+    const user = {
       ...newUser,
       createdAt: newUser.createdAt.getTime(),
       updatedAt: newUser.updatedAt.getTime(),
     };
 
-    return { modifiedUser };
+    return { user };
   }
 
   async findAll(): Promise<User[]> {
@@ -72,13 +76,7 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const modifiedUser = {
-      ...user,
-      createdAt: user.createdAt.getTime(),
-      updatedAt: user.updatedAt.getTime(),
-    };
-
-    return modifiedUser;
+    return user;
   }
 
   async update(id: string, updatePasswordDto: UpdateUserDto): Promise<User> {
@@ -92,14 +90,17 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.password !== oldPassword) {
+    const pass = bcrypt.compare(oldPassword, user.password);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    if (!pass) {
       throw new ForbiddenException('Old password is wrong');
     }
 
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
-        password: newPassword,
+        password: hashedPassword,
         version: user.version + 1,
         updatedAt: new Date(),
       },

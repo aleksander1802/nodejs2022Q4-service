@@ -14,12 +14,7 @@ export class AuthService {
   ) {}
 
   async signUp(signupDto: SignupDto) {
-    const hashedPassword = await bcrypt.hash(signupDto.password, 10);
-    const user = await this.usersService.create({
-      ...signupDto,
-      password: hashedPassword,
-    });
-    return user;
+    await this.usersService.create(signupDto);
   }
 
   async login(loginDto: LoginDto) {
@@ -32,9 +27,11 @@ export class AuthService {
     const payload: JwtPayload = { userId: user.id, login: user.login };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_KEY,
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
     return { accessToken, refreshToken };
@@ -52,9 +49,11 @@ export class AuthService {
     const payload: JwtPayload = { userId: user.id, login: user.login };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_KEY,
     });
     const newRefreshToken = this.jwtService.sign(payload, {
       expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
     return { accessToken, refreshToken: newRefreshToken };

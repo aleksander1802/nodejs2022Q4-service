@@ -4,6 +4,7 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { Public } from './public.decorator';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -13,12 +14,14 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: SignupDto) {
-    const user = await this.authService.signUp(signupDto);
-    return { user, message: 'User created successfully' };
+    await this.authService.signUp(signupDto);
+    return { message: 'User created successfully' };
   }
 
   @Public()
   @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: HttpStatus.OK, description: 'Successful login.' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }

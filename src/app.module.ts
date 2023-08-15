@@ -7,8 +7,6 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { AuthModule } from './auth/auth.module';
 
-import { ConfigModule } from '@nestjs/config';
-
 @Module({
   imports: [
     UsersModule,
@@ -18,7 +16,6 @@ import { ConfigModule } from '@nestjs/config';
     FavsModule,
     PrismaModule,
     AuthModule,
-    ConfigModule.forRoot({ isGlobal: true }),
   ],
 })
 export class AppModule {}
