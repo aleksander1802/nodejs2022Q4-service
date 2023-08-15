@@ -14,8 +14,7 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: SignupDto) {
-    await this.authService.signUp(signupDto);
-    return { message: 'User created successfully' };
+    return await this.authService.signUp(signupDto);
   }
 
   @Public()

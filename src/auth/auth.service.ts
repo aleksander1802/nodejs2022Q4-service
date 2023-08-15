@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async signUp(signupDto: SignupDto) {
-    await this.usersService.create(signupDto);
+    return await this.usersService.create(signupDto);
   }
 
   async login(loginDto: LoginDto) {
@@ -25,13 +25,13 @@ export class AuthService {
     }
 
     const payload: JwtPayload = { userId: user.id, login: user.login };
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: process.env.TOKEN_EXPIRE_TIME,
-      secret: process.env.JWT_SECRET_KEY,
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '1h',
+      secret: 'secret123123',
     });
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
-      secret: process.env.JWT_SECRET_REFRESH_KEY,
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '24h',
+      secret: 'secret123123',
     });
 
     return { accessToken, refreshToken };
@@ -48,12 +48,12 @@ export class AuthService {
 
     const payload: JwtPayload = { userId: user.id, login: user.login };
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.TOKEN_EXPIRE_TIME,
-      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: '1h',
+      secret: 'secret123123',
     });
     const newRefreshToken = this.jwtService.sign(payload, {
-      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
-      secret: process.env.JWT_SECRET_REFRESH_KEY,
+      expiresIn: '24h',
+      secret: 'secret123123',
     });
 
     return { accessToken, refreshToken: newRefreshToken };

@@ -6,7 +6,6 @@ import {
 import { PrismaService } from 'nestjs-prisma';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -36,10 +35,10 @@ export class UsersService {
       updatedAt: newUser.updatedAt.getTime(),
     };
 
-    return { user };
+    return user;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll() {
     const users = await this.prisma.user.findMany();
 
     return users.map((user) => ({
@@ -49,7 +48,7 @@ export class UsersService {
     }));
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -76,10 +75,16 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const modifiedUser = {
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    };
+
+    return modifiedUser;
   }
 
-  async update(id: string, updatePasswordDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updatePasswordDto: UpdateUserDto) {
     const { newPassword, oldPassword } = updatePasswordDto;
 
     const user = await this.prisma.user.findUnique({
@@ -90,12 +95,13 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const pass = bcrypt.compare(oldPassword, user.password);
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const pass = await bcrypt.compare(oldPassword, user.password);
 
     if (!pass) {
       throw new ForbiddenException('Old password is wrong');
     }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     const updatedUser = await this.prisma.user.update({
       where: { id },
@@ -106,11 +112,13 @@ export class UsersService {
       },
     });
 
-    return {
+    const modifiedUser = {
       ...updatedUser,
       createdAt: updatedUser.createdAt.getTime(),
       updatedAt: updatedUser.updatedAt.getTime(),
     };
+
+    return modifiedUser;
   }
 
   async remove(id: string) {

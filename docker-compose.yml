@@ -16,10 +16,6 @@ services:
       - '${PORT}:${PORT}'
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
-    env_file:
-      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -34,8 +30,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      TOKEN_EXPIRE_TIME: ${TOKEN_EXPIRE_TIME}
     ports:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
@@ -59,9 +53,3 @@ volumes:
 networks:
   my_network:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: ${SUBNET}
-          gateway: ${GATEWAY}
-          ip_range: ${IP_RANGE}
