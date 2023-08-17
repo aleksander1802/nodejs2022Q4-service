@@ -5,6 +5,7 @@ import { TracksModule } from './tracks/tracks.module';
 import { UsersModule } from './users/users.module';
 import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AlbumsModule } from './albums/albums.module';
     AlbumsModule,
     FavsModule,
     PrismaModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
