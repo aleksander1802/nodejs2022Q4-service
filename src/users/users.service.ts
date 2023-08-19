@@ -12,7 +12,7 @@ import { User } from './entities/user.entity';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
     const version = 1;
 
@@ -32,7 +32,7 @@ export class UsersService {
       updatedAt: newUser.updatedAt.getTime(),
     };
 
-    return modifiedUser;
+    return { modifiedUser };
   }
 
   async findAll(): Promise<User[]> {
@@ -48,6 +48,24 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const modifiedUser = {
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    };
+
+    return modifiedUser;
+  }
+
+  async findOneByLogin(login: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { login },
     });
 
     if (!user) {
@@ -94,7 +112,7 @@ export class UsersService {
     };
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });

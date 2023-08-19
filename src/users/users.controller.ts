@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import {
@@ -56,7 +56,7 @@ export class UsersController {
   @ApiOkResponse({ description: 'Successful operation', type: [User] })
   async findAll() {
     const users = await this.usersService.findAll();
-    return plainToClass(User, users);
+    return plainToInstance(User, users);
   }
 
   @Get(':id')

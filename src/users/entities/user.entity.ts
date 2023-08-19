@@ -18,8 +18,9 @@ export class User {
 
   @ApiPropertyOptional({
     required: false,
-    example: 1,
   })
+  token: string;
+
   version: number;
 
   @ApiPropertyOptional({
