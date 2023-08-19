@@ -15,7 +15,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, +process.env.CRYPT_SALT);
 
     const version = 1;
 
@@ -101,7 +101,10 @@ export class UsersService {
       throw new ForbiddenException('Old password is wrong');
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      +process.env.CRYPT_SALT,
+    );
 
     const updatedUser = await this.prisma.user.update({
       where: { id },

@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
     console.log('Inside AuthGuard: No token found.');
     try {
       const payload: JwtPayload = await this.jwtService.verifyAsync(token, {
-        secret: 'secret123123',
+        secret: process.env.JWT_SECRET_KEY,
       });
       console.log('Inside AuthGuard: No token found.');
       const user = await this.userService.findOne(payload.userId);

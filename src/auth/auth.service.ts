@@ -26,12 +26,12 @@ export class AuthService {
 
     const payload: JwtPayload = { userId: user.id, login: user.login };
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
-      secret: 'secret123123',
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_KEY,
     });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '24h',
-      secret: 'secret123123',
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
     return { accessToken, refreshToken };
@@ -48,12 +48,12 @@ export class AuthService {
 
     const payload: JwtPayload = { userId: user.id, login: user.login };
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
-      secret: 'secret123123',
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_KEY,
     });
     const newRefreshToken = this.jwtService.sign(payload, {
-      expiresIn: '24h',
-      secret: 'secret123123',
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
     });
 
     return { accessToken, refreshToken: newRefreshToken };
