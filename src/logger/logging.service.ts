@@ -55,8 +55,6 @@ export class LoggingService implements LoggerService {
       trace ? '\nTrace: ' + trace : ''
     }\n`;
 
-    // console.log(log);
-
     fs.stat(filePath, (err, stats) => {
       if (!err && stats.size > this.maxLogFileSizeKb * 1024) {
         const backupPath = filePath.replace(
