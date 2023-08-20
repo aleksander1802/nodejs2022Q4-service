@@ -7,71 +7,30 @@ import { ILoggingError } from './logging-error';
 export class LoggingService implements LoggerService {
   private logFilePath = path.resolve(__dirname, '../../logs/application.log');
   private errorLogFilePath = path.resolve(__dirname, '../../logs/error.log');
-  private currentLogLevel = process.env.LOG_LEVEL as LogLevel;
+  private currentLogLevel = (process.env.LOG_LEVEL as LogLevel) || 'verbose';
   private maxLogFileSizeKb: number =
     parseInt(process.env.MAX_LOG_FILE_SIZE_KB, 10) || 1024;
 
   private logger = new Logger();
 
   log(message: string) {
-    this.writeLogToFile(this.logFilePath, 'log', message);
+    this.logMessage('log', message);
   }
 
   error(data: ILoggingError) {
-    const {
-      message,
-      trace,
-      statusCode,
-      url,
-      method,
-      headers,
-      query,
-      body,
-      errorResponse,
-    } = data;
-    let log = `${new Date().toISOString()} [error] - ${message}${
-      trace ? '\nTrace: ' + trace : ''
-    }\n`;
-
-    if (statusCode) {
-      log += `Status Code: ${statusCode}\n`;
-    }
-    if (url) {
-      log += `URL: ${url}\n`;
-    }
-    if (method) {
-      log += `Method: ${method}\n`;
-    }
-    if (headers) {
-      log += `Headers: ${JSON.stringify(headers)}\n`;
-    }
-    if (query) {
-      log += `Query: ${JSON.stringify(query)}\n`;
-    }
-    if (body) {
-      log += `Body: ${JSON.stringify(body)}\n`;
-    }
-    if (errorResponse) {
-      log += `Error Response: ${JSON.stringify(errorResponse)}\n`;
-    }
-
-    this.writeLogToFile(this.errorLogFilePath, 'error', log);
+    this.logMessage('error', this.formatErrorLog(data), true);
   }
 
   warn(message: string) {
-    this.writeLogToFile(this.logFilePath, 'warn', message);
+    this.logMessage('warn', message);
   }
 
   debug(message: string) {
-    if (this.shouldLog('debug')) {
-      this.writeLogToFile(this.logFilePath, 'debug', message);
-    }
+    this.logMessage('debug', message);
   }
 
   verbose(message: string) {
-    if (this.shouldLog('verbose')) {
-      this.writeLogToFile(this.logFilePath, 'verbose', message);
-    }
+    this.logMessage('verbose', message);
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -83,7 +42,7 @@ export class LoggingService implements LoggerService {
       verbose: 4,
     };
 
-    return logLevelValues[level] >= logLevelValues[this.currentLogLevel];
+    return logLevelValues[level] <= logLevelValues[this.currentLogLevel];
   }
 
   private writeLogToFile(
@@ -95,6 +54,8 @@ export class LoggingService implements LoggerService {
     const log = `${new Date().toISOString()} [${level}] - ${message}${
       trace ? '\nTrace: ' + trace : ''
     }\n`;
+
+    // console.log(log);
 
     fs.stat(filePath, (err, stats) => {
       if (!err && stats.size > this.maxLogFileSizeKb * 1024) {
@@ -115,5 +76,48 @@ export class LoggingService implements LoggerService {
         this.logger.error(`Error writing log to ${filePath}: ${err}`);
       }
     });
+  }
+
+  private logMessage(
+    level: LogLevel,
+    message: string,
+    isError: boolean = false,
+  ) {
+    if (this.shouldLog(level)) {
+      const filePath = isError ? this.errorLogFilePath : this.logFilePath;
+      this.writeLogToFile(filePath, level, message);
+    }
+  }
+
+  private formatErrorLog(data: ILoggingError): string {
+    let log = `${new Date().toISOString()} [error] - ${data.message}`;
+
+    if (data.trace) {
+      log += `\nTrace: ${data.trace}`;
+    }
+
+    if (data.statusCode) {
+      log += `\nStatus Code: ${data.statusCode}`;
+    }
+    if (data.url) {
+      log += `\nURL: ${data.url}`;
+    }
+    if (data.method) {
+      log += `\nMethod: ${data.method}`;
+    }
+    if (data.headers) {
+      log += `\nHeaders: ${JSON.stringify(data.headers)}`;
+    }
+    if (data.query) {
+      log += `\nQuery: ${JSON.stringify(data.query)}`;
+    }
+    if (data.body) {
+      log += `\nBody: ${JSON.stringify(data.body)}`;
+    }
+    if (data.errorResponse) {
+      log += `\nError Response: ${JSON.stringify(data.errorResponse)}`;
+    }
+
+    return log;
   }
 }

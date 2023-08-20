@@ -21,23 +21,27 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.loggingService.error({
-        message: 'Internal server error',
-        trace: (exception as Error).stack,
-        statusCode: status,
-        url: request.url,
-        method: request.method,
-        headers: request.headers,
-        query: request.query,
-        body: request.body,
-      });
-    }
+    const errorResponse =
+      exception instanceof HttpException
+        ? exception.getResponse()
+        : 'Something went wrong.';
+
+    const trace = exception instanceof Error ? exception.stack : undefined;
+
+    this.loggingService.error({
+      message: 'Internal server error',
+      trace,
+      statusCode: status,
+      url: request.url,
+      method: request.method,
+      headers: request.headers,
+      query: request.query,
+      body: request.body,
+      errorResponse,
+    });
 
     response.status(status).json({
-      statusCode: status,
-      message:
-        'Something went wrong. Of course, this is a custom error. For educational purposes',
+      errorResponse,
     });
   }
 }
