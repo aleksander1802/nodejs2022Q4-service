@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -11,6 +12,7 @@ import { JwtPayload } from './jwt.inteface';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoggingService } from 'src/logger/logging.service';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +71,7 @@ export class AuthService {
       const user = await this.usersService.findOne(decoded.userId);
 
       if (!user) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('User not found');
       }
 
       const payload: JwtPayload = { userId: user.id, login: user.login };
@@ -84,6 +86,13 @@ export class AuthService {
 
       return { accessToken, refreshToken: newRefreshToken };
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new ForbiddenException('Refresh token expired');
+      }
+      if (error instanceof JsonWebTokenError) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
       this.loggingService.error({
         message: 'Error while refreshing tokens',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
