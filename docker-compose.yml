@@ -21,6 +21,8 @@ services:
         condition: service_healthy
     networks:
       - my_network
+    env_file:
+      - .env
 
   db:
     image: postgres

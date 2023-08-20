@@ -14,7 +14,7 @@ git clone https://github.com/aleksander1802/nodejs2023Q2-service.git
 ## Switch to the develop branch
 
 ```
-git checkout develop_part2
+git checkout develop_part3
 ```
 
 ## Installing NPM modules
@@ -44,7 +44,7 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 After application running open new terminal (in attached mode) and enter:
 
 ```
-npm run test
+npm run test:auth
 ```
 
 ## Checking for vulnerabilities (in some cases, you may need to start VPN)

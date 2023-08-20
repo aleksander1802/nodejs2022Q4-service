@@ -5,9 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-
 import { JwtService } from '@nestjs/jwt';
-
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { UsersService } from 'src/users/users.service';
@@ -34,23 +32,20 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      console.log('Inside AuthGuard: No token found.');
       throw new UnauthorizedException();
     }
-    console.log('Inside AuthGuard: No token found.');
+
     try {
       const payload: JwtPayload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET_KEY,
       });
-      console.log('Inside AuthGuard: No token found.');
+
       const user = await this.userService.findOne(payload.userId);
-      console.log('Inside AuthGuard: No token found.');
+
       if (user.login !== payload.login) {
-        console.log('Inside AuthGuard: No token found.');
         throw new Error('Invalid token');
       }
     } catch {
-      console.log('Inside AuthGuard: No token found.');
       throw new UnauthorizedException();
     }
     return true;
