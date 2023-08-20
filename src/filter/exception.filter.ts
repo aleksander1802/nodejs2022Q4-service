@@ -24,7 +24,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const errorResponse =
       exception instanceof HttpException
         ? exception.getResponse()
-        : 'Something went wrong.';
+        : { statusCode: status, message: 'Internal server error.' };
 
     const trace = exception instanceof Error ? exception.stack : undefined;
 
