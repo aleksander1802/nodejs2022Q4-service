@@ -37,7 +37,9 @@ export class AuthController {
     status: HttpStatus.CREATED,
     description: 'Successful signup.',
   })
-  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiBadRequestResponse({
+    description: 'No login or password, or they are not a strings',
+  })
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: SignupDto) {
     return await this.authService.signUp(signupDto);
@@ -50,8 +52,12 @@ export class AuthController {
     description: 'Login and return access and refresh tokens',
   })
   @ApiResponse({ status: HttpStatus.OK, description: 'Successful login.' })
-  @ApiBadRequestResponse({ description: 'Bad request' })
-  @ApiForbiddenResponse({ description: 'Authentication failed' })
+  @ApiBadRequestResponse({
+    description: 'No login or password, or they are not a strings',
+  })
+  @ApiForbiddenResponse({
+    description: "No user with such login, password doesn't match actual one",
+  })
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
     try {
@@ -74,8 +80,9 @@ export class AuthController {
     type: Token,
   })
   @ApiUnauthorizedResponse({
-    description: 'Refresh token is invalid or expired',
+    description: 'No refreshToken in body ',
   })
+  @ApiForbiddenResponse({ description: 'Refresh token is invalid or expired' })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshDto: RefreshDto) {
     return await this.authService.refreshTokens(refreshDto);
