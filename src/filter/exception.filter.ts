@@ -4,6 +4,9 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  UnauthorizedException,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { LoggingService } from 'src/logger/logging.service';
@@ -16,20 +19,41 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let errorResponse: any;
 
-    const errorResponse =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : { statusCode: status, message: 'Internal server error.' };
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      errorResponse = exception.getResponse();
+    } else if (exception instanceof UnauthorizedException) {
+      status = HttpStatus.FORBIDDEN;
+      errorResponse = {
+        statusCode: status,
+        message: 'Authentication failed.',
+      };
+    } else if (exception instanceof ForbiddenException) {
+      status = HttpStatus.FORBIDDEN;
+      errorResponse = {
+        statusCode: status,
+        message: 'Access forbidden.',
+      };
+    } else if (exception instanceof BadRequestException) {
+      status = HttpStatus.BAD_REQUEST;
+      errorResponse = {
+        statusCode: status,
+        message: exception.getResponse(),
+      };
+    } else {
+      errorResponse = {
+        statusCode: status,
+        message: 'Internal server error.',
+      };
+    }
 
     const trace = exception instanceof Error ? exception.stack : undefined;
 
     this.loggingService.error({
-      message: 'Internal server error',
+      message: errorResponse.message || 'Internal server error',
       trace,
       statusCode: status,
       url: request.url,
@@ -40,8 +64,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       errorResponse,
     });
 
-    response.status(status).json({
-      errorResponse,
-    });
+    response.status(status).json(errorResponse);
   }
 }

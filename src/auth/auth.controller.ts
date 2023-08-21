@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -7,9 +14,11 @@ import { Public } from './public.decorator';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Token } from './entities/token.entity';
 
@@ -24,7 +33,10 @@ export class AuthController {
     summary: 'Signup',
     description: 'Signup and return user',
   })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Successful login.' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successful signup.',
+  })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: SignupDto) {
@@ -42,7 +54,14 @@ export class AuthController {
   @ApiForbiddenResponse({ description: 'Authentication failed' })
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    try {
+      return this.authService.login(loginDto);
+    } catch (error) {
+      if (error.status === HttpStatus.FORBIDDEN) {
+        throw new ForbiddenException('Authentication failed');
+      }
+      throw error;
+    }
   }
 
   @Post('refresh')
@@ -50,13 +69,15 @@ export class AuthController {
     summary: 'Refresh token',
     description: 'Refresh and return access and refresh tokens',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
+  @ApiOkResponse({
     description: 'Successful refresh.',
     type: Token,
   })
+  @ApiUnauthorizedResponse({
+    description: 'Refresh token is invalid or expired',
+  })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshDto: RefreshDto) {
-    return await this.authService.refreshTokens(refreshDto.refreshToken);
+    return await this.authService.refreshTokens(refreshDto);
   }
 }

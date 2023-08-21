@@ -72,7 +72,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new ForbiddenException('User not found');
     }
 
     const modifiedUser = {
